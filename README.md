@@ -1,20 +1,94 @@
-# Local OpenTelemetry Metadata Injector on AWS
+# Getting started with Amazon Bedrock Managed Agents (powered by OpenAI)
 
-Local OpenTelemetry metadata injector for AWS — enriches telemetry data with AWS and user context before forwarding to a collector.
+A hands-on, beginner-first learning repo for **Amazon Bedrock Managed Agents
+(BMA), powered by OpenAI**. It starts from the basics and builds up, one module
+at a time. Right now it covers Module 1: running agents with **no execution
+environment** (`environment: {"type": "none"}`).
 
-> This project is under active development.
+> **Public preview.** BMA is in preview. APIs, request/response shapes, default
+> models, and Region availability can change, and some endpoints behave
+> differently from the generally available Bedrock APIs. Treat everything here
+> as a starting point, pin to the version you tested against, and check the
+> official docs (linked below) for the current behavior.
 
-## Contributing
+## What is BMA?
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+Bedrock Managed Agents lets you run OpenAI-style agents on AWS without managing
+the orchestration loop yourself. You describe the agent and send input; AWS runs
+the turn, calls the model, optionally runs tools, and stores the conversation
+for you. A few terms you will see throughout this repo:
 
-## Security
+- **Session** — the durable, server-side container for one agent conversation.
+  It holds the agent definition (model + instructions) and the full history.
+  Sessions are addressed by a session id (e.g. `sess_abc123`) and are never
+  deleted automatically — you delete them when you are done.
+- **Turn** — one request/response cycle within a session. You submit input, BMA
+  runs the model (and any tools), and produces output.
+- **Items** — the stored, structured record of what happened: user messages,
+  assistant messages, reasoning, tool/MCP calls, command executions, and so on.
+  You read items to interpret what an agent actually did.
+- **Events** — the streaming signals emitted while a turn runs (for example,
+  `agent.session.turn.output_text.done` and `agent.session.turn.completed`).
+  You drain events to show output as it is produced.
+- **Session role** — an IAM role that BMA *assumes* to perform
+  customer-authorized work (chiefly model inference). The calling identity must
+  be allowed to `iam:PassRole` this role to BMA. See
+  [Module 1 prerequisites](modules/01-bma-environment-none/00-prerequisites.md).
+- **Execution environment** — where the agent's tools/code run. BMA offers three
+  options:
+  - `none` — no execution environment; the agent reasons and calls model
+    inference (and remote MCP tools) only. **This repo focuses on `none` for
+    now.**
+  - `self-hosted` — you host the execution environment.
+  - AgentCore Runtime — AWS runs the execution environment for you.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md#security-issue-notifications) for information on reporting security issues.
+See [BMA documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai.html) for details
+## Repo map
+
+```text
+.
+├── README.md                     # you are here
+├── LICENSE                       # MIT-0 (MIT No Attribution)
+└── modules/
+    └── 01-bma-environment-none/  # Module 1: agents with environment=none
+        ├── README.md             # module overview + lab index
+        ├── 00-prerequisites.md   # install, credentials, IAM setup
+        ├── setup.sh              # create the module's Python virtualenv
+        ├── requirements.txt      # openai[bedrock], boto3
+        ├── bma_common.py         # shared client/role helpers used by every lab
+        ├── scripts/
+        │   └── create_session_role.sh  # create the BMA session role (least privilege)
+        └── labs/
+            ├── lab-01-create-session/
+            ├── lab-02-interpret-results/
+            ├── lab-03-session-state/
+            ├── lab-04-list-sessions/
+            ├── lab-05-delete-session/
+            └── lab-06-agentcore-gateway/
+```
+
+## Modules
+
+| Module | Focus / Key learning | Level | Est. time |
+|---|---|---|---|
+| [01 — BMA with `environment=none`](modules/01-bma-environment-none/README.md) | Create a session, interpret results and items, prove durable server-side session state, list and delete sessions, and (stretch) wire in AgentCore Gateway MCP tools — all without an execution environment. | Beginner | ~30–60 min |
+
+More modules (self-hosted and AgentCore Runtime execution environments) will
+follow.
+
+## Official documentation
+
+- [Bedrock Managed Agents, powered by OpenAI — overview](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai.html)
+- [Prerequisites](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai-prerequisites.html)
+- [Security](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai-security.html)
+- [Sessions](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai-sessions.html)
+- [API reference](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai-api-reference.html)
 
 ## License
 
 This repository is dual-licensed:
 
 - **Code** is licensed under the [MIT No Attribution (MIT-0)](LICENSE) license.
-- **Documentation and text content** is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)](LICENSE-DOCS.md) license.
+- **Documentation and text content** is licensed under the
+  [Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)](LICENSE-DOCS.md)
+  license.

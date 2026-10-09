@@ -1,0 +1,18 @@
+# Python virtual environments
+.venv/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Local environment files
+.env
+
+# macOS
+.DS_Store
+
+# Workflow / build tooling artifacts (not part of the published repo)
+.agents/
