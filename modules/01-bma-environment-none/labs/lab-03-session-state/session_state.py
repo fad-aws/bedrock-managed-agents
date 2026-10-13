@@ -175,11 +175,14 @@ def main(argv=None) -> int:
         print(f"Created shared list: {session_id}", file=sys.stderr)
         print(f"--- adding: {message!r}", file=sys.stderr)
         bma_common.drain_turn(client, session_id)
+        # Reproduce the connection flags so the follow-up command hits the SAME
+        # Region/profile — sessions are region-scoped (a mismatch gives a 404).
+        conn = bma_common.connection_flags(args)
         print(
             "\nShare this session id with others so they can add to the SAME "
             "list from their own terminal:\n"
-            "  python labs/lab-03-session-state/session_state.py "
-            f"--session-id {session_id} --user Bob \"book flights\"\n"
+            "  python labs/lab-03-session-state/session_state.py"
+            f"{conn} --session-id {session_id} --user Bob \"book flights\"\n"
             "Every reply shows the full list rebuilt from the shared, "
             "server-side session history.",
             file=sys.stderr,

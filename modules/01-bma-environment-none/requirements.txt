@@ -1,2 +1,5 @@
-openai[bedrock]
-boto3
+# Tested with openai[bedrock] 3.26.1 and boto3 1.43.110 (Python 3.12+);
+# bump as the BMA preview evolves. Soft lower-bound pins so a fresh install
+# is reproducible without freezing you to an exact patch release.
+openai[bedrock]>=3.26.1
+boto3>=1.43.110

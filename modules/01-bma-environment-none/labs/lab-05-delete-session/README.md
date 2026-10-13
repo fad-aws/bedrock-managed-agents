@@ -35,17 +35,20 @@ AWS profile). Then, in each new terminal, from the module root
 profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
-
 # delete one session
 python labs/lab-05-delete-session/delete_session.py sess_abc123
 
 # delete several at once
 python labs/lab-05-delete-session/delete_session.py sess_abc123 sess_def456
 
-# target a specific profile/region
-python labs/lab-05-delete-session/delete_session.py --aws-profile <your-aws-profile> sess_abc123
+# target a specific profile/region (match how the session was created)
+python labs/lab-05-delete-session/delete_session.py --aws-profile <your-aws-profile> --region us-west-2 sess_abc123
 ```
+
+> **Delete in the same Region the session was created in.** Sessions are
+> region-scoped, so you must pass the same `--region` (and profile) used to
+> create them. Deleting with the wrong Region returns a `404 no managed agent
+> session found` even though the session exists elsewhere.
 
 Use [Lab 04](../lab-04-list-sessions/README.md) first to find the ids you
 want to remove.

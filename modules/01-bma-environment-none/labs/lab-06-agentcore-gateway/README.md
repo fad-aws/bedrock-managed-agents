@@ -112,7 +112,7 @@ later, on the `mcp_call` item, which is why the debugging section matters.
    BMA calls the Gateway as the session role (default
    `BedrockManagedAgentsPreviewInferenceServiceRole`, from
    [`00-prerequisites.md`](../../00-prerequisites.md) /
-   `scripts/create_session_role.sh`). That role's identity policy must allow
+   `scripts/create_session_role.py`). That role's identity policy must allow
    `bedrock-agentcore:InvokeGateway` on the Gateway ARN. Add it with
    least-privilege (scope the `Resource` to the specific Gateway ARN, not
    `*`), and verify before using beyond a sandbox:
@@ -161,8 +161,6 @@ sure your AWS profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass
 `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
-
 # Set your Gateway ARN once, then reuse it below.
 export GATEWAY_ARN=arn:aws:bedrock-agentcore:us-east-1:123456789012:gateway/my-gateway-id
 
@@ -252,6 +250,15 @@ application log for the real server-side cause.
 
 - **The tool decides the outcome.** Each add is gated on `GetRandomBool`;
   the server-side list only changes when the tool returns `true`.
+- **This gate is a demonstration, not an authorization control.** The "only
+  add when the tool returns true" rule lives entirely in the agent's
+  natural-language instructions — nothing in code enforces it. A prompt
+  injection or a model mistake can bypass it, and the agent could add an item
+  without the tool returning `true`. That is acceptable here because the only
+  effect is this sample's session state. **For any real side effect, enforce
+  authorization deterministically in your own trusted code** (check the tool
+  result and perform the action yourself), and treat model-selected tools and
+  model output as untrusted input — never as an authorization decision.
 - **Service-side IAM, no secrets in the client.** BMA calls the Gateway as
   the session role — you never pass a token or URL from here.
 - **Fixed at creation.** The tool is attached when the list is created;

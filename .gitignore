@@ -14,5 +14,7 @@ __pycache__/
 # macOS
 .DS_Store
 
-# Workflow / build tooling artifacts (not part of the published repo)
-.agents/
+# Workflow / build tooling artifacts (not part of the published repo).
+# Ignore everything under .agents/ EXCEPT the Codex skills we ship on purpose.
+.agents/*
+!.agents/skills/

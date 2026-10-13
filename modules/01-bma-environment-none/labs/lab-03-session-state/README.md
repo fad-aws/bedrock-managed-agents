@@ -56,8 +56,6 @@ AWS profile). Then, in each new terminal, from the module root
 profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
-
 # person A — start the shared list (prints the id)
 python labs/lab-03-session-state/session_state.py --user Alice "buy milk"
 
@@ -70,9 +68,18 @@ python labs/lab-03-session-state/session_state.py \
     --session-id sess_abc123 --user Alice "milk is done"
 ```
 
-Each run is a fresh process with no shared local state, so reusing the same
-`--session-id` across runs in one terminal already demonstrates the point —
-separate terminals (or people) just make it extra convincing.
+By using the same `--session-id`, you can simulate different users in different terminals working on the same to-do list. It also shows the session persistence handled by BMA.
+
+To see the full stored history for the shared list — every user message and
+assistant reply BMA kept server-side — inspect its items with
+[Lab 02](../lab-02-interpret-results/README.md)'s script:
+
+```bash
+python labs/lab-02-interpret-results/interpret_results.py --session-id sess_abc123
+```
+
+(Add `--region`/`--aws-profile` to match how you created the session, and
+`--json` for full detail.)
 
 ## Expected output
 

@@ -60,7 +60,7 @@ FAILURE_EVENTS = {
 
 # Default name of the IAM role that BMA assumes to do customer-authorized work
 # (chiefly model inference). The calling identity must be allowed to
-# iam:PassRole this role to BMA. The scripts/create_session_role.sh helper
+# iam:PassRole this role to BMA. The scripts/create_session_role.py helper
 # creates a role with this name by default. Override at runtime with
 # --role-arn or the BMA_INFERENCE_ROLE_ARN env var if yours differs.
 DEFAULT_ROLE_NAME = "BedrockManagedAgentsPreviewInferenceServiceRole"
@@ -99,6 +99,30 @@ def add_role_arn_arg(parser: argparse.ArgumentParser) -> None:
             "calling identity's account id if neither is set."
         ),
     )
+
+
+def connection_flags(args: argparse.Namespace) -> str:
+    """Reconstruct the connection flags the user ran with, as a CLI suffix.
+
+    Sessions are REGION-SCOPED: a follow-up command (continue, inspect, delete)
+    must target the SAME Region (and profile) the session was created in, or
+    the service returns a 404 "no managed agent session found" because it looks
+    in the wrong Region. The lab scripts print follow-up commands, so they
+    append this suffix to make those commands copy-paste correct.
+
+    Returns e.g. " --region us-west-2 --aws-profile bma-test" (leading space),
+    or "" when the defaults were used. Only non-default values are emitted:
+    --region when it differs from DEFAULT_REGION, and --aws-profile when one
+    was given (explicitly or via $AWS_PROFILE).
+    """
+    parts = []
+    region = getattr(args, "region", None)
+    if region and region != DEFAULT_REGION:
+        parts.append(f"--region {region}")
+    profile = getattr(args, "aws_profile", None)
+    if profile:
+        parts.append(f"--aws-profile {profile}")
+    return (" " + " ".join(parts)) if parts else ""
 
 
 def make_client(region: str, aws_profile: str | None) -> OpenAI:

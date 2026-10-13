@@ -123,12 +123,16 @@ def main(argv=None) -> int:
     # Drain the first turn that create() already started.
     bma_common.drain_turn(client, session_id)
 
+    # Reproduce the connection flags so the printed follow-up commands target
+    # the SAME Region/profile — sessions are region-scoped, and a mismatched
+    # Region yields a confusing 404 on inspect/delete.
+    conn = bma_common.connection_flags(args)
     print(
         f"\nSession kept open: {session_id}\n"
         "  * inspect its items:  python labs/lab-02-interpret-results/"
-        f"interpret_results.py --session-id {session_id}\n"
+        f"interpret_results.py{conn} --session-id {session_id}\n"
         "  * delete it when done: python labs/lab-05-delete-session/"
-        f"delete_session.py {session_id}",
+        f"delete_session.py{conn} {session_id}",
         file=sys.stderr,
     )
     return 0

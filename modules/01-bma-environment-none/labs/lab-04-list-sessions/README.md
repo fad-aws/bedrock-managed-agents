@@ -22,12 +22,6 @@ should clean up. `sessions.list(...)` returns a page of sessions, each with:
 page** (`page.data`), rendering a table or `--json`. `--order desc` (default)
 shows newest first; `--limit` (1–100) bounds a single request.
 
-> **Why no auto-pagination?** The SDK's pager rebuilds its own `after`
-> cursor from the last item's id, but this preview endpoint treats `after`
-> as an opaque value and rejects the reconstructed cursor as
-> `malformed base64`. So this lab deliberately reads only the one page that
-> `--limit` asks for. If `page.has_more` is set, it prints a note telling
-> you to raise `--limit` rather than silently paging.
 
 ## The command
 
@@ -38,8 +32,6 @@ AWS profile). Then, in each new terminal, from the module root
 profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
-
 # most recent 20 sessions
 python labs/lab-04-list-sessions/list_sessions.py
 

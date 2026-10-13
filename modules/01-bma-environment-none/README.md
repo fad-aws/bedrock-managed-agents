@@ -24,7 +24,7 @@ once:
 
 ```bash
 cd modules/01-bma-environment-none
-./setup.sh
+python3 setup.py   # macOS/Linux; on Windows use `python setup.py`
 ```
 
 ### 2. Set your AWS profile in every terminal
@@ -41,13 +41,29 @@ A stale or wrong profile shows up as a `401 AuthenticationError`. Fix it by
 exporting the correct `AWS_PROFILE` (or passing `--aws-profile`) for that
 terminal.
 
-## Run convention
+### 3. Verify you're ready
 
-All labs use the same convention: **activate the venv, then run the lab script
-directly.** There are no per-lab wrapper scripts.
+After the venv is built and your profile is configured, run the read-only
+preflight check to confirm your Python/SDK, AWS identity, Region, session role,
+and IAM config before Lab 01:
 
 ```bash
-source .venv/bin/activate
+python preflight.py
+```
+
+It reports each check as CONFIRMED, UNVERIFIED, or FAILED and prints a next
+action for anything that needs attention. See
+[Verify you're ready](00-prerequisites.md#6-verify-youre-ready) for what the
+labels mean.
+
+## Run convention
+
+All labs use the same convention: with the venv **active** (set up once in the
+[prerequisites](00-prerequisites.md#1-install-the-tools); re-activate in each
+new terminal with `source .venv/bin/activate`, or `.\.venv\Scripts\Activate.ps1`
+on Windows), run the lab script directly. There are no per-lab wrapper scripts.
+
+```bash
 python labs/lab-01-create-session/create_session.py "Hello, BMA!"
 ```
 
@@ -71,3 +87,23 @@ Work through the labs in order; each one builds on the ideas before it.
 
 > The lab files are added in the labs' own commits; the directory and script
 > names above are the stable paths every lab uses.
+
+## Use these labs from Codex (optional)
+
+This repo ships a [Codex](https://developers.openai.com/codex/) **skill** that
+lets you drive these labs conversationally instead of remembering each script's
+flags. It lives at `.agents/skills/bma-sessions/` in the repo root, so Codex
+discovers it automatically when you launch Codex anywhere inside this
+repository.
+
+The `bma-sessions` skill knows how to create, continue, inspect, list, and
+delete BMA sessions, and how to attach an AgentCore Gateway tool — by running
+the same lab scripts documented above. Ask Codex naturally (for example,
+"create a BMA session and ask it the capital of France", or "list my BMA
+sessions and delete the idle ones"), or invoke it explicitly with
+`$bma-sessions`.
+
+The skill still relies on the prerequisites on this page: the venv must be set
+up and your AWS profile and session role must be configured. It makes real AWS
+calls and never deletes sessions on its own — it will surface session ids and
+offer cleanup.

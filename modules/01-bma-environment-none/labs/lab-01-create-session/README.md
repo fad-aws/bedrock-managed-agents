@@ -41,12 +41,24 @@ stream and reads lifecycle events until the turn completes:
 
 Before your first run, complete the one-time
 [prerequisites](../../00-prerequisites.md) (create the venv and configure your
-AWS profile). Then, in each new terminal, from the module root
+AWS profile). As the recommended first check, run the read-only preflight from
+the module root to confirm your Python/SDK, AWS identity, Region, session role,
+and IAM config are in place:
+
+```bash
+python preflight.py
+```
+
+It reports each check as CONFIRMED / UNVERIFIED / FAILED; fix anything FAILED
+(using the printed next action) before running the lab. See
+[Verify you're ready](../../00-prerequisites.md#6-verify-youre-ready) for
+details.
+
+Then, in each new terminal, from the module root
 (`modules/01-bma-environment-none`), activate the venv and make sure your AWS
 profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
 python labs/lab-01-create-session/create_session.py "What is the capital of France?"
 ```
 
@@ -62,6 +74,11 @@ python labs/lab-01-create-session/create_session.py \
 ```
 
 Pass `--help` for the full flag list.
+
+> **Note:** a non-default `--model` only works if the session role's inference
+> policy allows that model (see
+> [prerequisites](../../00-prerequisites.md#2-configure-aws-credentials-and-a-region));
+> otherwise inference is denied.
 
 ## Expected output
 

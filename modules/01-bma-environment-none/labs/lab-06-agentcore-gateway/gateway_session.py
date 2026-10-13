@@ -252,22 +252,26 @@ def main(argv=None) -> int:
         print(f"Created gated shared list: {session_id}", file=sys.stderr)
         print(f"--- trying to add: {message!r}", file=sys.stderr)
         bma_common.drain_turn(client, session_id)
+        # Reproduce the connection flags so follow-up commands hit the SAME
+        # Region/profile — sessions are region-scoped (mismatch => 404).
+        conn = bma_common.connection_flags(args)
         print(
             "\nShare this session id so others can add to the SAME gated list "
             "from their own terminal (no --gateway-arn needed — the tool is "
             "already attached):\n"
-            "  python labs/lab-06-agentcore-gateway/gateway_session.py "
-            f"--session-id {session_id} --user Bob \"book flights\"",
+            "  python labs/lab-06-agentcore-gateway/gateway_session.py"
+            f"{conn} --session-id {session_id} --user Bob \"book flights\"",
             file=sys.stderr,
         )
 
+    conn = bma_common.connection_flags(args)
     print(
         f"\nSession kept open: {session_id}\n"
         "  * inspect its items (and the GetRandomBool mcp_call result/errors): "
         "python labs/lab-02-interpret-results/interpret_results.py --json "
-        f"--session-id {session_id}\n"
+        f"{conn} --session-id {session_id}\n"
         "  * delete it when done: python labs/lab-05-delete-session/"
-        f"delete_session.py {session_id}",
+        f"delete_session.py{conn} {session_id}",
         file=sys.stderr,
     )
     return 0

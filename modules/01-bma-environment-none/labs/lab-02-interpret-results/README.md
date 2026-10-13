@@ -45,8 +45,6 @@ AWS profile). Then, in each new terminal, from the module root
 profile is set (`export AWS_PROFILE=<your-aws-profile>` or pass `--aws-profile`):
 
 ```bash
-source .venv/bin/activate
-
 # inspect the session you created in Lab 01
 python labs/lab-02-interpret-results/interpret_results.py --session-id sess_abc123
 

@@ -49,15 +49,19 @@ See [BMA documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bed
 .
 ├── README.md                     # you are here
 ├── LICENSE                       # MIT-0 (MIT No Attribution)
+├── .agents/
+│   └── skills/
+│       └── bma-sessions/         # Codex skill: drive the labs conversationally
 └── modules/
     └── 01-bma-environment-none/  # Module 1: agents with environment=none
         ├── README.md             # module overview + lab index
         ├── 00-prerequisites.md   # install, credentials, IAM setup
-        ├── setup.sh              # create the module's Python virtualenv
+        ├── setup.py              # create the module's Python virtualenv
+        ├── preflight.py          # read-only "verify you're ready" check (identity/region/role/IAM)
         ├── requirements.txt      # openai[bedrock], boto3
         ├── bma_common.py         # shared client/role helpers used by every lab
         ├── scripts/
-        │   └── create_session_role.sh  # create the BMA session role (least privilege)
+        │   └── create_session_role.py  # create the BMA session role (least privilege)
         └── labs/
             ├── lab-01-create-session/
             ├── lab-02-interpret-results/
@@ -75,6 +79,23 @@ See [BMA documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bed
 
 More modules (self-hosted and AgentCore Runtime execution environments) will
 follow.
+
+## Use it from Codex (optional)
+
+This repo ships a [Codex](https://developers.openai.com/codex/) **skill**,
+`bma-sessions`, that lets you drive the Module 1 labs conversationally instead
+of remembering each script's flags — create, continue, inspect, list, and
+delete BMA sessions, and attach an AgentCore Gateway tool. It lives at
+[`.agents/skills/bma-sessions/`](.agents/skills/bma-sessions/README.md), so
+Codex discovers it automatically when launched anywhere in this repo.
+
+Ask naturally (for example, "create a BMA session and ask it the capital of
+France", or "list my BMA sessions and delete the idle ones"), or invoke it
+explicitly with `$bma-sessions`. It still relies on the same
+[prerequisites](modules/01-bma-environment-none/00-prerequisites.md) (venv, AWS
+profile, session role), makes real AWS calls, and never deletes sessions on its
+own. See its [README](.agents/skills/bma-sessions/README.md) for setup and
+example prompts.
 
 ## Official documentation
 
