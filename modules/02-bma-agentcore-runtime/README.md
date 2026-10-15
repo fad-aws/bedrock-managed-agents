@@ -24,6 +24,21 @@ Two other things change from Module 1, both handled for you by
 > tutorial and the
 > [BMA prerequisites doc](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-managed-agents-openai-prerequisites.html).
 
+## What this module covers
+
+Same session spine as Module 1, with three deliberate changes. Auth is a
+short-lived **bearer token** (minted by `aws-bedrock-token-generator` from your
+AWS credential chain) instead of SigV4 — still no OpenAI API key. The session
+role is **`BmaSessionRole-<region>`**, whose policy also allows the Runtime
+invoke actions. And the session's environment is now an **AgentCore Runtime** —
+a **managed microVM**: as the agent works, **BMA invokes the Runtime**
+(`InvokeAgentRuntime`) to **execute commands** in a workspace, the Runtime
+streams the command and its output **back to BMA**, and BMA records it on the
+session. So the items you read back include **`command_execution`** (the exact
+command plus its output), on top of `message` and `reasoning`.
+
+![BMA with an AgentCore Runtime environment: your agent client code starts or continues a session via the BMA session API using a bearer token; BMA assumes BmaSessionRole-<region> and runs model inference via Amazon Bedrock; BMA invokes the AgentCore Runtime (InvokeAgentRuntime), a managed microVM that executes commands in a workspace and streams the command and output back to BMA; BMA records items (message, reasoning, command_execution) on the durable server-side session, which the client reads back.](images/architecture.png)
+
 ## Prerequisites
 
 Do the one-time setup in [00-prerequisites.md](00-prerequisites.md) — it has
